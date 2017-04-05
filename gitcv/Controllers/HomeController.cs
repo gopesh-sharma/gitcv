@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using gitcv.Models.Services;
 using gitcv.Models.Types;
+using Octokit;
+using System.Threading.Tasks;
 
 namespace gitcv.Controllers
 {
@@ -31,16 +33,16 @@ namespace gitcv.Controllers
 
         public ActionResult Results(string loginName)
         {
-            var user = new GithubUser();
+            var user = new User();
             var languages = new Dictionary<string, int>();
-            var repos = new List<GithubRepository>();
+            var repos = new List<Repository>();
 
             try
             {
                 user = GithubService.GetUser(loginName);
-                languages = GithubService.GetLanguages(loginName);
-                repos = GithubService.GetRepositories(loginName);
-                repos.Sort((x, y) => String.CompareOrdinal(x.name, y.name));
+                repos = GithubService.GetRepositories(loginName).ToList();
+                languages = GithubService.GetLanguages(repos);
+                repos.Sort((x, y) => String.CompareOrdinal(x.Name, y.Name));
             }
             catch
             {
@@ -50,8 +52,8 @@ namespace gitcv.Controllers
             
             ViewBag.User = user;
             ViewBag.Repositories = repos;
-            ViewBag.OriginalRepositories = repos.Where(r => r.fork == false);
-            ViewBag.ForkedRepositories = repos.Where(r => r.fork == true);
+            ViewBag.OriginalRepositories = repos.Where(r => r.Fork == false);
+            ViewBag.ForkedRepositories = repos.Where(r => r.Fork == true);
             ViewBag.Languages = languages;
 
             return View();

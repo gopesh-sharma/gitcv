@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using NUnit.Framework;
 using gitcv.Models.Services;
-using gitcv.Models.Types;
+using Octokit;
 
 namespace gitcv.Tests.Models.Services
 {
@@ -15,21 +12,22 @@ namespace gitcv.Tests.Models.Services
         public void ShouldReturnUserLoginName()
         {
             var user = GithubService.GetUser("robertgreiner");
-            Assert.AreEqual("robertgreiner", user.login);
+            Assert.AreEqual("robertgreiner", user.Login);
         }
 
         [Test]
         public void ShouldReturnRepositoryInformation()
         {
             var repos = GithubService.GetRepositories("robertgreiner");
-            Assert.IsNotEmpty(repos.First().clone_url);
-            Assert.AreEqual("robertgreiner", repos.First().owner.login);
+            Assert.IsNotEmpty(repos.First().CloneUrl);
+            Assert.AreEqual("robertgreiner", repos.First().Owner.Login);
         }
 
         [Test]
         public void ShouldGetRepositoryLanguages()
         {
-            var languages = GithubService.GetLanguages("robertgreiner");
+            var repos = GithubService.GetRepositories("robertgreiner").ToList();
+            var languages = GithubService.GetLanguages(repos);
             Assert.IsTrue(languages.Count > 3);
         }
     }

@@ -1,0 +1,47 @@
+﻿@using gitcv.Models.Types
+@model dynamic
+@{
+    ViewBag.Title = "GitCV - Helping you hire the best developers.";
+}
+
+
+<div class="loginWrapper">
+    
+    <div class="loginLogo" style="top: -110px; left: 82%;">
+        <img src="@Url.Content("~/Content/images/beta.png")" alt="beta logo"/>
+    </div>
+
+    <div class="loginLogo">        
+        <img src="@Url.Content("~/Content/images/loginLogo.png")" alt="" />
+    </div>
+    @{
+        if (!String.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <p style="margin-bottom: 20px; color: #FF0000;">
+                @ViewBag.ErrorMessage    
+            </p>
+            <div class="fix">
+            </div>
+        }
+    }
+    <div class="loginPanel">
+        <div class="head">
+            <h5 class="iUser">
+                Github User Search</h5>
+        </div>
+        @using (FormExtensions.BeginForm(Html))
+        {
+            <fieldset>
+                <div class="loginRow noborder mainForm">
+                    <label for="req1">
+                        Username:</label>
+                    <div class="loginInput">
+                        <input type="text" name="loginName" class="validate[required]" id="loginName" /></div>
+                    <div class="fix">
+                    </div>
+                    <input style="margin-top: 16px;" type="submit" value="Search" class="greyishBtn submitForm" />
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>

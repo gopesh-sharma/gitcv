@@ -1,7 +1,8 @@
 ﻿@using gitcv.Models.Types
+@using Octokit;
 @{
     ViewBag.Title = "GitCV - Helping you hire the best developers.";
-    GithubUser user = ViewBag.User;
+    Octokit.User user = ViewBag.User;
     var originalRepositories = ViewBag.OriginalRepositories;
     var forkedRepositories = ViewBag.ForkedRepositories;
     Dictionary<string, int> languages = ViewBag.Languages;
@@ -10,10 +11,10 @@
     <div class="fixed">
         <div class="wrapper">
             <div class="welcome">
-                <img src="http://www.gravatar.com/avatar/@user.gravatar_id?s=22" alt="Profile Picture" /><span>@user.login</span></div>
+                <img src="@user.AvatarUrl" alt="Profile Picture" /><span>@user.Login</span></div>
             <div class="userNav">
                 <ul>
-                    <li><a href="@user.html_url" title="">
+                    <li><a href="@user.HtmlUrl" title="">
                         <img src="@Url.Content("~/Content/images/icons/topnav/profile.png")" alt="" /><span>View
                             Profile</span></a></li>
                     <li><a href="/" title="">
@@ -31,7 +32,7 @@
             <img src="@Url.Content("~/Content/images/loginLogo.png")" alt="" /></a></div>
     <div class="middleNav">
         <ul>
-            <li class="iUser"><a href="https://github.com/@user.login/followers" target="_blank" title="">
+            <li class="iUser"><a href="https://github.com/@user.Login/followers" target="_blank" title="">
                 <span>Followers</span></a></li>
         </ul>
     </div>
@@ -46,12 +47,12 @@
         </div>
         <div class="stats">
             <ul>
-                <li><a href="#" class="count grey" title="Public Repository count">@user.public_repos</a><span>Public
+                <li><a href="#" class="count grey" title="Public Repository count">@user.PublicGists</a><span>Public
                     Repositories</span></li>
-                <li><a href="#" class="count grey" title="Public Gist count">@user.public_gists</a><span>Public
+                <li><a href="#" class="count grey" title="Public Gist count">@user.PublicGists</a><span>Public
                     Gists</span></li>
-                <li><a href="#" class="count grey" title="Number of People following">@user.following</a><span>Following</span></li>
-                <li class="last"><a href="#" class="count grey" title="Number of Followers">@user.followers</a><span>Followers</span></li>
+                <li><a href="#" class="count grey" title="Number of People following">@user.Following</a><span>Following</span></li>
+                <li class="last"><a href="#" class="count grey" title="Number of Followers">@user.Followers</a><span>Followers</span></li>
             </ul>
             <div class="fix">
             </div>
@@ -133,14 +134,14 @@
                         {
                         <tr>
                             <td>
-                                <a href="@repo.html_url" target="_blank">@repo.name</a>
+                                <a href="@repo.HtmlUrl" target="_blank">@repo.Name</a>
                             </td>
-                            <td>@repo.description
+                            <td>@repo.Description
                             </td>
-                            <td>@repo.language
+                            <td>@repo.Language
                             </td>
                             <td>
-                                <a href="@repo.homepage" target="_blank">@repo.homepage</a>
+                                <a href="@repo.Homepage" target="_blank">@repo.Homepage</a>
                             </td>
                         </tr>
                         }
@@ -176,14 +177,14 @@
                         {
                         <tr>
                             <td>
-                                <a href="@repo.html_url" target="_blank">@repo.name</a>
+                                <a href="@repo.HtmlUrl" target="_blank">@repo.Name</a>
                             </td>
-                            <td>@repo.description
+                            <td>@repo.Description
                             </td>
-                            <td>@repo.language
+                            <td>@repo.Language
                             </td>
                             <td>
-                                <a href="@repo.homepage" target="_blank">@repo.homepage</a>
+                                <a href="@repo.Homepage" target="_blank">@repo.Homepage</a>
                             </td>
                         </tr>
                         }
@@ -200,29 +201,29 @@
                 <p>
                     @{
                         var md = new MarkdownSharp.Markdown();
-                        @Html.Raw(md.Transform(user.bio));
+                        @Html.Raw(md.Transform(user.Bio));
                     }
                 </p>
             </div>
         </div>
         <blockquote>
             @{
-                if (@user.hireable)
+                if (@user.Hireable.HasValue)
                 {
-                <span>@user.name is currently seeking a new job.</span>
+                <span>@user.Name is currently seeking a new job.</span>
                 }
                 else
                 {
-                <span>@user.name is not seeking a new job at this time.</span>
+                <span>@user.Name is not seeking a new job at this time.</span>
                 }
 
-                if (string.IsNullOrEmpty(@user.email))
+                if (string.IsNullOrEmpty(@user.Email))
                 {
-                <a href="@user.html_url">Get in touch.</a>
+                <a href="@user.HtmlUrl">Get in touch.</a>
                 }
                 else
                 {
-                <a href="mailto:@user.email">Get in touch.</a>                    
+                <a href="mailto:@user.Email">Get in touch.</a>                    
                 }
             }
         </blockquote>
