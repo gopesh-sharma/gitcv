@@ -1,47 +1,75 @@
-﻿@using gitcv.Models.Types
-@model dynamic
+﻿@model dynamic
 @{
-    ViewBag.Title = "GitCV - Helping you hire the best developers.";
+    ViewBag.Title = "GitCV - Get Details of the User";
 }
-
-
-<div class="loginWrapper">
-    
-    <div class="loginLogo" style="top: -110px; left: 82%;">
-        <img src="@Url.Content("~/Content/images/beta.png")" alt="beta logo"/>
-    </div>
-
-    <div class="loginLogo">        
-        <img src="@Url.Content("~/Content/images/loginLogo.png")" alt="" />
-    </div>
-    @{
+<div class="jumbotron text-center">
+    @using (Html.BeginForm())
+    {
+        <h1>GIT CV</h1>
+        <p>We get you the Online CV of a git User</p>
+        <form>
+            <div class="input-group">
+                <input type="search" id="loginName" name="loginName" class="form-control" size="50" placeholder="Search git by Username" required>
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-danger">Search</button>
+                </div>
+            </div>
+        </form>
+        
         if (!String.IsNullOrEmpty(ViewBag.ErrorMessage))
         {
-            <p style="margin-bottom: 20px; color: #FF0000;">
-                @ViewBag.ErrorMessage    
-            </p>
-            <div class="fix">
-            </div>
+            <div class="label-danger">@ViewBag.ErrorMessage</div>
         }
-    }
-    <div class="loginPanel">
-        <div class="head">
-            <h5 class="iUser">
-                Github User Search</h5>
+        
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <img src="~/Content/images/github.png" class="img-responsive center-block" />
+            </div>
         </div>
-        @using (FormExtensions.BeginForm(Html))
-        {
-            <fieldset>
-                <div class="loginRow noborder mainForm">
-                    <label for="req1">
-                        Username:</label>
-                    <div class="loginInput">
-                        <input type="text" name="loginName" class="validate[required]" id="loginName" /></div>
+     }
+</div>
+    @*
+        <div class="loginWrapper">
+
+            <div class="loginLogo" style="top: -110px; left: 82%;">
+                <img src="@Url.Content("~/Content/images/beta.png")" alt="beta logo" />
+            </div>
+
+            <div class="loginLogo">
+                <img src="@Url.Content("~/Content/images/loginLogo.png")" alt="" />
+            </div>
+            @{
+                if (!String.IsNullOrEmpty(ViewBag.ErrorMessage))
+                {
+                    <p style="margin-bottom: 20px; color: #FF0000;">
+                        @ViewBag.ErrorMessage
+                    </p>
                     <div class="fix">
                     </div>
-                    <input style="margin-top: 16px;" type="submit" value="Search" class="greyishBtn submitForm" />
+                }
+            }
+            <div class="loginPanel">
+                <div class="head">
+                    <h5 class="iUser">
+                        Github User Search
+                    </h5>
                 </div>
-            </fieldset>
-        }
-    </div>
-</div>
+                @using (FormExtensions.BeginForm(Html))
+                {
+                    <fieldset>
+                        <div class="loginRow noborder mainForm">
+                            <label for="req1">
+                                Username:
+                            </label>
+                            <div class="loginInput">
+                                <input type="text" name="loginName" class="validate[required]" id="loginName" />
+                            </div>
+                            <div class="fix">
+                            </div>
+                            <input style="margin-top: 16px;" type="submit" value="Search" class="greyishBtn submitForm" />
+                        </div>
+                    </fieldset>
+                }
+            </div>
+        </div>
+    *@

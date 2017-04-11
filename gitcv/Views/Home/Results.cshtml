@@ -1,235 +1,405 @@
-﻿@using gitcv.Models.Types
-@using Octokit;
+﻿@using Octokit;
 @{
     ViewBag.Title = "GitCV - Helping you hire the best developers.";
     Octokit.User user = ViewBag.User;
     var originalRepositories = ViewBag.OriginalRepositories;
     var forkedRepositories = ViewBag.ForkedRepositories;
-    Dictionary<string, int> languages = ViewBag.Languages;
+    Dictionary<string, int> bestLanguages = ViewBag.Languages;
+    var userTitle = user.Location != null ? user.Name + " ( " + user.Location + " )" : user.Name;
 }
-<div id="topNav">
-    <div class="fixed">
-        <div class="wrapper">
-            <div class="welcome">
-                <img src="@user.AvatarUrl" alt="Profile Picture" /><span>@user.Login</span></div>
-            <div class="userNav">
-                <ul>
-                    <li><a href="@user.HtmlUrl" title="">
-                        <img src="@Url.Content("~/Content/images/icons/topnav/profile.png")" alt="" /><span>View
-                            Profile</span></a></li>
-                    <li><a href="/" title="">
-                        <img src="@Url.Content("~/Content/images/icons/topnav/logout.png")" alt="" /><span>Search</span></a></li>
-                </ul>
-            </div>
-            <div class="fix">
-            </div>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">GitCv</a>
         </div>
-    </div>
-</div>
-<div id="header" class="wrapper">
-    <div class="logo">
-        <a href="/" title="">
-            <img src="@Url.Content("~/Content/images/loginLogo.png")" alt="" /></a></div>
-    <div class="middleNav">
-        <ul>
-            <li class="iUser"><a href="https://github.com/@user.Login/followers" target="_blank" title="">
-                <span>Followers</span></a></li>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="@user.HtmlUrl">View Profile</a></li>
+            @if (!string.IsNullOrEmpty(@user.Email))
+            {
+                <text>
+                    <li><a href="mailto:@user.Email">Get In Touch</a></li>
+                </text>
+            }
+            <li><a href="https://api.github.com/users/@user.Login/followers">Followers</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li>Profile Created : @user.CreatedAt.Date.ToShortDateString()</li>
         </ul>
     </div>
-    <div class="fix">
+</nav>
+<div class="container margin-top-50">
+    <div class="row header">
+        <div class="col-lg-2 col-lg-offset-1">
+            <img class="img-responsive" src="@user.AvatarUrl" />
+        </div>
+        <div class="col-lg-8 text-center username">
+            <h1>@userTitle</h1>           
+        </div>
+    </div>
+    <div class="row margin-top-20 margin-bottom-20">
+        <div class="col-md-3 text-center">
+            <a href="#">Private Repositories <span class="badge">@user.OwnedPrivateRepos</span></a>
+        </div>
+        <div class="col-md-3 text-center">
+            <a href="#">Public Repositories <span class="badge">@user.PublicRepos</span></a>
+        </div>
+        <div class="col-md-3 text-center">
+            <a href="#">Followers <span class="badge">@user.Followers</span></a>
+        </div>
+        <div class="col-md-3 text-center">
+            <a href="#">Following <span class="badge">@user.Following</span></a>
+        </div>
     </div>
 </div>
-<div class="wrapper">
-    <div class="content">
-        <div class="title">
-            <h5>
-                Github Activity</h5>
+@if (bestLanguages.Count > 2)
+{
+    <div class="row">
+        <div class="col-lg-10 col-lg-offset-1">
+            <div id="chart1"/>
         </div>
-        <div class="stats">
-            <ul>
-                <li><a href="#" class="count grey" title="Public Repository count">@user.PublicGists</a><span>Public
-                    Repositories</span></li>
-                <li><a href="#" class="count grey" title="Public Gist count">@user.PublicGists</a><span>Public
-                    Gists</span></li>
-                <li><a href="#" class="count grey" title="Number of People following">@user.Following</a><span>Following</span></li>
-                <li class="last"><a href="#" class="count grey" title="Number of Followers">@user.Followers</a><span>Followers</span></li>
-            </ul>
-            <div class="fix">
-            </div>
+    </div>
+}
+@if (originalRepositories.Count > 0)
+{
+    <div class="row">
+        <div class="col-lg-12 text-center repository-header">
+            <h1>Original Repositories</h1>
         </div>
-        <div class="widget">
-            <div class="head">
-                <h5 class="iChart8">
-                    Languages
-                </h5>
-            </div>
-            <div class="body">
-                <div id="languageChart" style="width: 970px; height: 300px;">
-                </div>
-                <script type="text/javascript">
-                            
-                    var data = [];
-                            
-                    var lang = @Html.Raw(Json.Encode(languages.Keys));
-                    var count = @Html.Raw(Json.Encode(languages.Values));
-                    for (var i = 0; i < lang.length; i++) {
-                        data[i] = { label: lang[i], data: count[i] };
-                    }
+    </div>
+}
 
-                    $.plot($("#languageChart"), data,
-                        {
-                            series: {
-                                pie: {
-                                    show: true,
-                                    radius: 1,
-                                    label: {
-                                        show: true,
-                                        radius: 1,
-                                        formatter: function (label, series) {
-                                            return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
-                                        },
-                                        background: { opacity: 0.8 }
-                                    }
-                                }
-                            },
-                            legend: {
-                                show: false
-                            },
-                            grid: {
-                                hoverable: false,
-                                clickable: true
-                            }
-                        });
-                    $("#interactive").bind("plothover", pieHover);
-                    $("#interactive").bind("plotclick", pieClick);
-
-                </script>
+@{
+    foreach (var repo in originalRepositories)
+    {
+        <div class="row margin-top-5">
+            <div class="col-lg-2 col-lg-offset-2 text-center">
+                <a href="@repo.HtmlUrl" target="_blank">@repo.Name</a>
             </div>
-        </div>
-        <div class="widget">
-            <div class="head">
-                <h5 class="iFrames">
-                    Public Repositories</h5>
-            </div>
-            <table cellpadding="0" cellspacing="0" width="100%" class="tableStatic resize">
-                <thead>
-                    <tr>
-                        <td>
-                            Name
-                        </td>
-                        <td>
-                            Description
-                        </td>
-                        <td>
-                            Language
-                        </td>
-                        <td>
-                            Homepage
-                        </td>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{                        
-                        foreach (var repo in originalRepositories)
-                        {
-                        <tr>
-                            <td>
-                                <a href="@repo.HtmlUrl" target="_blank">@repo.Name</a>
-                            </td>
-                            <td>@repo.Description
-                            </td>
-                            <td>@repo.Language
-                            </td>
-                            <td>
-                                <a href="@repo.Homepage" target="_blank">@repo.Homepage</a>
-                            </td>
-                        </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="widget">
-            <div class="head">
-                <h5 class="iFrames">
-                    Forked Repositories</h5>
-            </div>
-            <table cellpadding="0" cellspacing="0" width="100%" class="tableStatic resize">
-                <thead>
-                    <tr>
-                        <td>
-                            Name
-                        </td>
-                        <td>
-                            Description
-                        </td>
-                        <td>
-                            Language
-                        </td>
-                        <td>
-                            Homepage
-                        </td>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{                        
-                        foreach (var repo in forkedRepositories)
-                        {
-                        <tr>
-                            <td>
-                                <a href="@repo.HtmlUrl" target="_blank">@repo.Name</a>
-                            </td>
-                            <td>@repo.Description
-                            </td>
-                            <td>@repo.Language
-                            </td>
-                            <td>
-                                <a href="@repo.Homepage" target="_blank">@repo.Homepage</a>
-                            </td>
-                        </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="widget">
-            <div class="head">
-                <h5 class="iCreate">
-                    Bio</h5>
-            </div>
-            <div class="body">
-                <p>
-                    @{
-                        var md = new MarkdownSharp.Markdown();
-                        @Html.Raw(md.Transform(user.Bio));
-                    }
-                </p>
-            </div>
-        </div>
-        <blockquote>
-            @{
-                if (@user.Hireable.HasValue)
+            <div class="col-lg-4 text-center">
+                @if (repo.Description != "")
                 {
-                <span>@user.Name is currently seeking a new job.</span>
+                    @repo.Description;
                 }
                 else
                 {
-                <span>@user.Name is not seeking a new job at this time.</span>
+                    <text>"No Desciption Given";</text>
                 }
-
-                if (string.IsNullOrEmpty(@user.Email))
+            </div>
+            <div class="col-lg-2 text-center">
+                @if (repo.Language != "")
                 {
-                <a href="@user.HtmlUrl">Get in touch.</a>
+                    @repo.Language;
                 }
                 else
                 {
-                <a href="mailto:@user.Email">Get in touch.</a>                    
+                    <text>"No Language Specified";</text>
                 }
+
+            </div>
+        </div>
+    }
+}
+@if (forkedRepositories.Count > 0)
+{
+    <div class="row">
+        <div class="col-lg-12 text-center repository-header">
+            <h1>Forked Repositories</h1>
+        </div>
+    </div>
+}
+@{
+    foreach (var repo in forkedRepositories)
+    {
+
+        <div class="row margin-top-5">
+            <div class="col-lg-2 col-lg-offset-2 text-center">
+                <a href="@repo.HtmlUrl" target="_blank">@repo.Name</a>
+            </div>
+            <div class="col-lg-4 text-center">
+                @if (repo.Description != "")
+                {
+                    @repo.Description;
+                }
+                else
+                {
+                    <text>"No Desciption Given";</text>
+                }
+            </div>
+            <div class="col-lg-2 text-center">
+                @if (repo.Language != "")
+                {
+                    @repo.Language;
+                }
+                else
+                {
+                    <text>"No Language Specified";</text>
+                }
+
+            </div>
+        </div>
+    }
+}
+
+
+<script>
+    $(document).ready(function () {
+        $.jqplot.config.enablePlugins = true;
+        var s1 = @Html.Raw(Json.Encode(bestLanguages.Select(a=>a.Value).ToArray()));
+        var ticks = @Html.Raw(Json.Encode(bestLanguages.Select(a=>a.Key).ToArray()));
+
+        plot1 = $.jqplot('chart1', [s1], {
+            animate: !$.jqplot.use_excanvas,
+            seriesDefaults: {
+                renderer: $.jqplot.BarRenderer,
+                pointLabels: { show: true }
+            },
+            series: [{ seriesColors: ["#B37C57"] }],
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks: ticks
+                }
+            },
+            highlighter: { show: false }
+        });
+
+        $('#chart1').bind('jqplotDataClick',
+            function (ev, seriesIndex, pointIndex, data) {
+                $('#info1').html('series: ' + seriesIndex + ', point: ' + pointIndex + ', data: ' + data);
             }
-        </blockquote>
+        );
+
+        window.onresize = function (event) {
+            plot1.replot();
+        }
+    });
+</script>
+@*
+    <div id="topNav">
+        <div class="fixed">
+            <div class="wrapper">
+                <div class="welcome">
+                    <img src="@user.AvatarUrl" alt="Profile Picture" /><span>@user.Login</span></div>
+                <div class="userNav">
+                    <ul>
+                        <li><a href="@user.HtmlUrl" title="">
+                            <img src="@Url.Content("~/Content/images/icons/topnav/profile.png")" alt="" /><span>View
+                                Profile</span></a></li>
+                        <li><a href="/" title="">
+                            <img src="@Url.Content("~/Content/images/icons/topnav/logout.png")" alt="" /><span>Search</span></a></li>
+                    </ul>
+                </div>
+                <div class="fix">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="header" class="wrapper">
+        <div class="logo">
+            <a href="/" title="">
+                <img src="@Url.Content("~/Content/images/loginLogo.png")" alt="" /></a></div>
+        <div class="middleNav">
+            <ul>
+                <li class="iUser"><a href="https://github.com/@user.Login/followers" target="_blank" title="">
+                    <span>Followers</span></a></li>
+            </ul>
+        </div>
         <div class="fix">
         </div>
     </div>
-</div>
-<div class="fix">
-</div>
+    <div class="wrapper">
+        <div class="content">
+            <div class="title">
+                <h5>
+                    Github Activity</h5>
+            </div>
+            <div class="stats">
+                <ul>
+                    <li><a href="#" class="count grey" title="Public Repository count">@user.PublicGists</a><span>Public
+                        Repositories</span></li>
+                    <li><a href="#" class="count grey" title="Public Gist count">@user.PublicGists</a><span>Public
+                        Gists</span></li>
+                    <li><a href="#" class="count grey" title="Number of People following">@user.Following</a><span>Following</span></li>
+                    <li class="last"><a href="#" class="count grey" title="Number of Followers">@user.Followers</a><span>Followers</span></li>
+                </ul>
+                <div class="fix">
+                </div>
+            </div>
+            <div class="widget">
+                <div class="head">
+                    <h5 class="iChart8">
+                        Languages
+                    </h5>
+                </div>
+                <div class="body">
+                    <div id="languageChart" style="width: 970px; height: 300px;">
+                    </div>
+                    <script type="text/javascript">
+
+                        var data = [];
+
+                        var lang = @Html.Raw(Json.Encode(languages.Keys));
+                        var count = @Html.Raw(Json.Encode(languages.Values));
+                        for (var i = 0; i < lang.length; i++) {
+                            data[i] = { label: lang[i], data: count[i] };
+                        }
+
+                        $.plot($("#languageChart"), data,
+                            {
+                                series: {
+                                    pie: {
+                                        show: true,
+                                        radius: 1,
+                                        label: {
+                                            show: true,
+                                            radius: 1,
+                                            formatter: function (label, series) {
+                                                return '<div style="font-size:8pt;text-align:center;padding:2px;color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
+                                            },
+                                            background: { opacity: 0.8 }
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    show: false
+                                },
+                                grid: {
+                                    hoverable: false,
+                                    clickable: true
+                                }
+                            });
+                        $("#interactive").bind("plothover", pieHover);
+                        $("#interactive").bind("plotclick", pieClick);
+
+                    </script>
+                </div>
+            </div>
+            <div class="widget">
+                <div class="head">
+                    <h5 class="iFrames">
+                        Public Repositories</h5>
+                </div>
+                <table cellpadding="0" cellspacing="0" width="100%" class="tableStatic resize">
+                    <thead>
+                        <tr>
+                            <td>
+                                Name
+                            </td>
+                            <td>
+                                Description
+                            </td>
+                            <td>
+                                Language
+                            </td>
+                            <td>
+                                Homepage
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var repo in originalRepositories)
+                            {
+                            <tr>
+                                <td>
+                                    <a href="@repo.HtmlUrl" target="_blank">@repo.Name</a>
+                                </td>
+                                <td>@repo.Description
+                                </td>
+                                <td>@repo.Language
+                                </td>
+                                <td>
+                                    <a href="@repo.Homepage" target="_blank">@repo.Homepage</a>
+                                </td>
+                            </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="widget">
+                <div class="head">
+                    <h5 class="iFrames">
+                        Forked Repositories</h5>
+                </div>
+                <table cellpadding="0" cellspacing="0" width="100%" class="tableStatic resize">
+                    <thead>
+                        <tr>
+                            <td>
+                                Name
+                            </td>
+                            <td>
+                                Description
+                            </td>
+                            <td>
+                                Language
+                            </td>
+                            <td>
+                                Homepage
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var repo in forkedRepositories)
+                            {
+                            <tr>
+                                <td>
+                                    <a href="@repo.HtmlUrl" target="_blank">@repo.Name</a>
+                                </td>
+                                <td>@repo.Description
+                                </td>
+                                <td>@repo.Language
+                                </td>
+                                <td>
+                                    <a href="@repo.Homepage" target="_blank">@repo.Homepage</a>
+                                </td>
+                            </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="widget">
+                <div class="head">
+                    <h5 class="iCreate">
+                        Bio</h5>
+                </div>
+                <div class="body">
+                    <p>
+                        @{
+                            var md = new MarkdownSharp.Markdown();
+                            @Html.Raw(md.Transform(user.Bio));
+                        }
+                    </p>
+                </div>
+            </div>
+            <blockquote>
+                @{
+                    if (@user.Hireable.HasValue)
+                    {
+                    <span>@user.Name is currently seeking a new job.</span>
+                    }
+                    else
+                    {
+                    <span>@user.Name is not seeking a new job at this time.</span>
+                    }
+
+                    if (string.IsNullOrEmpty(@user.Email))
+                    {
+                    <a href="@user.HtmlUrl">Get in touch.</a>
+                    }
+                    else
+                    {
+                    <a href="mailto:@user.Email">Get in touch.</a>
+                    }
+                }
+            </blockquote>
+            <div class="fix">
+            </div>
+        </div>
+    </div>
+    <div class="fix">
+    </div>
+*@

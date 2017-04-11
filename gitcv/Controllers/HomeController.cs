@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using gitcv.Models.Services;
-using gitcv.Models.Types;
 using Octokit;
-using System.Threading.Tasks;
 
 namespace gitcv.Controllers
 {
@@ -18,9 +15,8 @@ namespace gitcv.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(FormCollection collection)
+        public ActionResult Index(string loginName)
         {
-            var loginName = collection["loginName"];
 
             if (String.IsNullOrEmpty(loginName))
             {
@@ -28,7 +24,7 @@ namespace gitcv.Controllers
                 return View("Index");
             }
 
-            return new RedirectResult(loginName);
+            return RedirectToAction("Results", "Home", new { loginName = loginName });
         }
 
         public ActionResult Results(string loginName)
@@ -36,13 +32,16 @@ namespace gitcv.Controllers
             var user = new User();
             var languages = new Dictionary<string, int>();
             var repos = new List<Repository>();
+            var mainRepos = new List<Repository>();
+            var forkRepos = new List<Repository>();
 
             try
             {
                 user = GithubService.GetUser(loginName);
                 repos = GithubService.GetRepositories(loginName).ToList();
+                mainRepos = GithubService.GetMainOriginalRepos(repos);
+                forkRepos = GithubService.GetMainForkedRepos(repos);
                 languages = GithubService.GetLanguages(repos);
-                repos.Sort((x, y) => String.CompareOrdinal(x.Name, y.Name));
             }
             catch
             {
@@ -51,12 +50,12 @@ namespace gitcv.Controllers
             }
             
             ViewBag.User = user;
-            ViewBag.Repositories = repos;
-            ViewBag.OriginalRepositories = repos.Where(r => r.Fork == false);
-            ViewBag.ForkedRepositories = repos.Where(r => r.Fork == true);
+            ViewBag.OriginalRepositories = mainRepos;
+            ViewBag.ForkedRepositories = forkRepos;
             ViewBag.Languages = languages;
-
+            
             return View();
+
         }
  
     }

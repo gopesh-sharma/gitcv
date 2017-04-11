@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Web.Optimization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -28,9 +29,9 @@ namespace gitcv
            );
 
             routes.MapRoute(
-                "Results",
-                "{loginName}",
-                new { controller = "Home", action = "Results", loginName = UrlParameter.Optional }
+                name : "Results",
+                url : "{loginName}",
+                defaults: new { controller = "Home", action = "Results", loginName = UrlParameter.Optional }
             );
 
         }
@@ -41,6 +42,7 @@ namespace gitcv
 
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
     }
 }

@@ -11,22 +11,22 @@ namespace gitcv.Tests.Models.Services
         [Test]
         public void ShouldReturnUserLoginName()
         {
-            var user = GithubService.GetUser("robertgreiner");
-            Assert.AreEqual("robertgreiner", user.Login);
+            var user = GithubService.GetUser("gopesh-sharma");
+            Assert.AreEqual("gopesh-sharma", user.Login);
         }
 
         [Test]
         public void ShouldReturnRepositoryInformation()
         {
-            var repos = GithubService.GetRepositories("robertgreiner");
+            var repos = GithubService.GetRepositories("gopesh-sharma");
             Assert.IsNotEmpty(repos.First().CloneUrl);
-            Assert.AreEqual("robertgreiner", repos.First().Owner.Login);
+            Assert.AreEqual("gopesh-sharma", repos.First().Owner.Login);
         }
 
         [Test]
         public void ShouldGetRepositoryLanguages()
         {
-            var repos = GithubService.GetRepositories("robertgreiner").ToList();
+            var repos = GithubService.GetRepositories("gopesh-sharma").ToList();
             var languages = GithubService.GetLanguages(repos);
             Assert.IsTrue(languages.Count > 3);
         }
